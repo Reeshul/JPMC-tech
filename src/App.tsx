@@ -1,26 +1,62 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
+import DataStreamer, { ServerRespond } from './DataStreamer';
+import Graph from './Graph';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+interface IState {
+  data: ServerRespond[];
+  showGraph: boolean;
+}
+
+class App extends Component<{}, IState> {
+  constructor(props: {}) {
+    super(props);
+    this.state = {
+      data: [],
+      showGraph: false,
+    };
+  }
+
+  renderGraph() {
+    if (this.state.showGraph) {
+      return <Graph data={this.state.data} />;
+    }
+  }
+
+  getDataFromServer() {
+    let x = 0;
+    const interval = setInterval(() => {
+      DataStreamer.getData((serverResponds: ServerRespond[]) => {
+        this.setState({
+          data: serverResponds,
+          showGraph: true,
+        });
+      });
+      x++;
+      if (x > 1000) {
+        clearInterval(interval);
+      }
+    }, 100);
+  }
+
+  render() {
+    return (
+      <div className="App">
+        <header className="App-header">Stock simulation</header>
+        <div className="App-content">
+          <button
+            className="btn btn-primary Stream-button"
+            onClick={() => {
+              this.getDataFromServer();
+            }}
+          >
+            Start Streaming Data
+          </button>
+          <div className="Graph">{this.renderGraph()}</div>
+        </div>
+      </div>
+    );
+  }
 }
 
 export default App;

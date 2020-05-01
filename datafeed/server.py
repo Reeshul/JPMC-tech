@@ -40,14 +40,14 @@ from SocketServer import ThreadingMixIn
 
 # Sim params
 
-REALTIME = True
+REALTIME = False
 SIM_LENGTH = timedelta(days=365 * 5)
 MARKET_OPEN = datetime.today().replace(hour=0, minute=30, second=0)
 
 # Market parms
 #       min  / max  / std
 SPD = (2.0,   6.0,   0.1)
-PX = (60.0,  150.0, 1)
+PX = (60.0,  150.0, 0.2)
 FREQ = (12,    36,   50)
 
 # Trades
@@ -286,16 +286,10 @@ class App(object):
     @route('/query')
     def handle_query(self, x):
         """ Takes no arguments, and yields the current top of the book;  the
-            best bid and ask and their sizes
+            best bid and ask and their sizes.
         """
-        try:
-            t1, bids1, asks1 = self._current_book_1.next()
-            t2, bids2, asks2 = self._current_book_2.next()
-        except Exception as e:
-            print "error getting stocks...reinitalizing app"
-            self.__init__()
-            t1, bids1, asks1 = self._current_book_1.next()
-            t2, bids2, asks2 = self._current_book_2.next()
+        t1, bids1, asks1 = self._current_book_1.next()
+        t2, bids2, asks2 = self._current_book_2.next()
         t = t1 if t1 > t2 else t2
         print 'Query received @ t%s' % t
         return [{
