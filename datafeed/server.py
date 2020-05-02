@@ -81,7 +81,7 @@ def orders(hist):
         a series of market conditions.
     """
     for t, px, spd in hist:
-        stock = 'ABC' if random() > 0.5 else 'DEF'
+        stock = 'Stock X' if random() > 0.5 else 'Stock Y'
         side, d = ('sell', 2) if random() > 0.5 else ('buy', -2)
         order = round(normalvariate(px + (spd / d), spd / OVERLAP), 2)
         size = int(abs(normalvariate(0, 100)))
@@ -254,8 +254,8 @@ class App(object):
     def __init__(self):
         self._book_1 = dict()
         self._book_2 = dict()
-        self._data_1 = order_book(read_csv(), self._book_1, 'ABC')
-        self._data_2 = order_book(read_csv(), self._book_2, 'DEF')
+        self._data_1 = order_book(read_csv(), self._book_1, 'Stock X')
+        self._data_2 = order_book(read_csv(), self._book_2, 'Stock Y')
         self._rt_start = datetime.now()
         self._sim_start, _, _ = self._data_1.next()
         self.read_10_first_lines()
@@ -294,7 +294,7 @@ class App(object):
         print 'Query received @ t%s' % t
         return [{
             'id': x and x.get('id', None),
-            'stock': 'ABC',
+            'stock': 'Stock X',
             'timestamp': str(t),
             'top_bid': bids1 and {
                 'price': bids1[0][0],
@@ -307,7 +307,7 @@ class App(object):
         },
             {
             'id': x and x.get('id', None),
-            'stock': 'DEF',
+            'stock': 'Stock Y',
             'timestamp': str(t),
             'top_bid': bids2 and {
                 'price': bids2[0][0],

@@ -1,36 +1,38 @@
 import { ServerRespond } from './DataStreamer';
 
 export interface Row {
-  price_abc: number;
-  price_def: number;
+  price_x: number;
+  price_y: number;
   ratio: number;
   timestamp: Date;
+  bound_limit: number;
   upper_bound: number;
   lower_bound: number;
-  trigger_alert: number | undefined;
+  trigger: number;
 }
 
 export class DataManipulator {
   static generateRow(serverRespond: ServerRespond[]): Row {
-    const priceABC =
+    const priceOfStockX =
       (serverRespond[0].top_ask.price + serverRespond[0].top_bid.price) / 2;
-    const priceDEF =
+    const priceOfStockY =
       (serverRespond[1].top_ask.price + serverRespond[1].top_bid.price) / 2;
-    const ratio = priceABC / priceDEF;
-    const upperBound = 1 + 0.02;
-    const lowerBound = 1 - 0.02;
+    const ratio = priceOfStockX / priceOfStockY;
+    const boundLimit = 0.01;
+    const upperBound = 1 + boundLimit;
+    const lowerBound = 1 - boundLimit;
     return {
-      price_abc: priceABC,
-      price_def: priceDEF,
+      price_x: priceOfStockX,
+      price_y: priceOfStockY,
       ratio,
       timestamp:
         serverRespond[0].timestamp > serverRespond[1].timestamp
           ? serverRespond[0].timestamp
           : serverRespond[1].timestamp,
+      bound_limit: boundLimit,
       upper_bound: upperBound,
       lower_bound: lowerBound,
-      trigger_alert:
-        ratio > upperBound || ratio < lowerBound ? ratio : undefined,
+      trigger: ratio > upperBound || ratio < lowerBound ? ratio : NaN,
     };
   }
 }

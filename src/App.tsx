@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import DataStreamer, { ServerRespond } from './DataStreamer';
-import Graph from './Graph';
+import RatioGraph from './RatioGraph';
 import './App.css';
+import StocksGraph from './StocksGraph';
 
 interface IState {
   data: ServerRespond[];
@@ -17,9 +18,15 @@ class App extends Component<{}, IState> {
     };
   }
 
-  renderGraph() {
+  renderRatioGraph() {
     if (this.state.showGraph) {
-      return <Graph data={this.state.data} />;
+      return <RatioGraph data={this.state.data} />;
+    }
+  }
+
+  renderStockGraph() {
+    if (this.state.showGraph) {
+      return <StocksGraph data={this.state.data} />;
     }
   }
 
@@ -42,7 +49,6 @@ class App extends Component<{}, IState> {
   render() {
     return (
       <div className="App">
-        <header className="App-header">Stock simulation</header>
         <div className="App-content">
           <button
             className="btn btn-primary Stream-button"
@@ -50,9 +56,12 @@ class App extends Component<{}, IState> {
               this.getDataFromServer();
             }}
           >
-            Start Streaming Data
+            Stream Data
           </button>
-          <div className="Graph">{this.renderGraph()}</div>
+          <header className="App-header">Stocks X & Y</header>
+          <div className="Graph">{this.renderStockGraph()}</div>
+          <header className="App-header">Stock X / Stock Y</header>
+          <div className="Graph">{this.renderRatioGraph()}</div>
         </div>
       </div>
     );

@@ -18,29 +18,29 @@ interface PerspectiveViewerElement extends HTMLElement {
 
 // Data drilled from App.tsx as props into this graph component which renders Pesrpective
 
-class Graph extends Component<IProps, {}> {
+class RatioGraph extends Component<IProps, {}> {
   // Perspective table
 
   table: Table | undefined;
 
   render() {
-    return React.createElement('perspective-viewer');
+    return React.createElement('perspective-viewer', { id: 'ratio' });
   }
 
   componentDidMount() {
     // Get element from the DOM.
-    const elem = (document.getElementsByTagName(
-      'perspective-viewer'
-    )[0] as unknown) as PerspectiveViewerElement;
+    const elem = (document.getElementById(
+      'ratio'
+    ) as unknown) as PerspectiveViewerElement;
 
     const schema = {
-      price_abc: 'float',
-      price_def: 'float',
+      price_x: 'float',
+      price_y: 'float',
       ratio: 'float',
       timestamp: 'date',
       upper_bound: 'float',
       lower_bound: 'float',
-      trigger_alert: 'float',
+      trigger: 'float',
     };
 
     if (window.perspective && window.perspective.worker()) {
@@ -53,18 +53,18 @@ class Graph extends Component<IProps, {}> {
       elem.setAttribute('row-pivots', '["timestamp"]');
       elem.setAttribute(
         'columns',
-        '["ratio", "lower_bound", "upper_bound", "trigger_alert"]'
+        '["ratio", "lower_bound", "upper_bound", "trigger"]'
       );
       elem.setAttribute(
         'aggregates',
         JSON.stringify({
-          price_abc: 'avg',
-          price_def: 'avg',
+          price_x: 'avg',
+          price_y: 'avg',
           ratio: 'avg',
           timestamp: 'distinct count',
           upper_bound: 'avg',
           lower_bound: 'avg',
-          trigger_alert: 'avg',
+          trigger: 'avg',
         })
       );
     }
@@ -77,4 +77,4 @@ class Graph extends Component<IProps, {}> {
   }
 }
 
-export default Graph;
+export default RatioGraph;
