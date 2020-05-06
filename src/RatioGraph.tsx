@@ -10,13 +10,15 @@ interface IProps {
   data: ServerRespond[];
 }
 
-// Perspective library adds load - an interface wrapper for TypeScript
+// Gets 'PerspectiveViewerElement' to behave like an HTML element
 
 interface PerspectiveViewerElement extends HTMLElement {
+  // Load table in the HTML element
+
   load: (table: Table) => void;
 }
 
-// Data drilled from App.tsx as props into this graph component which renders Pesrpective
+// Drill data as props into RadioGraph component
 
 class RatioGraph extends Component<IProps, {}> {
   // Perspective table
@@ -28,7 +30,8 @@ class RatioGraph extends Component<IProps, {}> {
   }
 
   componentDidMount() {
-    // Get element from the DOM.
+    // Reference the 'perspective-viewer' element created above
+
     const elem = (document.getElementById(
       'ratio'
     ) as unknown) as PerspectiveViewerElement;
@@ -47,14 +50,29 @@ class RatioGraph extends Component<IProps, {}> {
       this.table = window.perspective.worker().table(schema);
     }
     if (this.table) {
-      // Load the `table` in the `<perspective-viewer>` DOM reference.
+      // Load the table in <perspective-viewer>
+
       elem.load(this.table);
+
+      // CONFIGURE GRAPH
+
+      // Line graph
+
       elem.setAttribute('view', 'y_line');
+
+      // Map datapoints based on the timestamp
+
       elem.setAttribute('row-pivots', '["timestamp"]');
+
+      // Monitor ratio, lower_bound, upper_bound and trigger
+
       elem.setAttribute(
         'columns',
         '["ratio", "lower_bound", "upper_bound", "trigger"]'
       );
+
+      // Handle duplicate data so that each datapoint is unique - ie one price for one timestamp
+
       elem.setAttribute(
         'aggregates',
         JSON.stringify({

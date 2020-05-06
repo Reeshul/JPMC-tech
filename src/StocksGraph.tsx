@@ -3,27 +3,25 @@ import { Table } from '@finos/perspective';
 import { ServerRespond } from './DataStreamer';
 import './Graph.css';
 
-/**
- * Props declaration for <Graph />
- */
+// Props declaration for <Graph />
+
 interface IProps {
   data: ServerRespond[];
 }
 
-/**
- * Perspective library adds load to HTMLElement prototype.
- * This interface acts as a wrapper for Typescript compiler.
- */
+// Gets 'PerspectiveViewerElement' to behave like an HTML element
+
 interface PerspectiveViewerElement extends HTMLElement {
+  // Load table in the HTML element
+
   load: (table: Table) => void;
 }
 
-/**
- * React component that renders Perspective based on data
- * parsed from its parent through data property.
- */
+// Drill data as props into StocksGraph component
+
 class StocksGraph extends Component<IProps, {}> {
   // Perspective table
+
   table: Table | undefined;
 
   render() {
@@ -31,7 +29,8 @@ class StocksGraph extends Component<IProps, {}> {
   }
 
   componentDidMount() {
-    // Get element to attach the table from the DOM.
+    // Reference the <perspective-viewer> element created above
+
     const elem = (document.getElementById(
       'stocks'
     ) as unknown) as PerspectiveViewerElement;
@@ -47,34 +46,50 @@ class StocksGraph extends Component<IProps, {}> {
       this.table = window.perspective.worker().table(schema);
     }
     if (this.table) {
-      // Load the `table` in the `<perspective-viewer>` DOM reference.
+      // Load the table in <perspective-viewer>
 
-      // Add more Perspective configurations here.
       elem.load(this.table);
+
+      // CONFIGURE GRAPH
+
+      // Line graph
+
       elem.setAttribute('view', 'y_line');
+
+      // Two stocks, each with a value of ["stock"]
+
       elem.setAttribute('column-pivots', '["stock"]');
+
+      // Map datapoints based on the timestamp
+
       elem.setAttribute('row-pivots', '["timestamp"]');
+
+      // Ensure we only use the top_ask_price to to correspond with the value of the stock
+
       elem.setAttribute('columns', '["top_ask_price"]');
+
+      // Handle duplicate data so that each datapoint is unique - ie one price for one timestamp. If there are two prices for a timestamp then average the top_bid_price and top_ask_price
+
       elem.setAttribute(
         'aggregates',
-        `{
-        "stock":"distinct count",
-        "top_ask_price":"avg",
-        "top_bid_price":"avg",
-        "timestamp":"distinct count"
-      }`
+        JSON.stringify({
+          stock: 'distinct count',
+          top_ask_price: 'avg',
+          top_bid_price: 'avg',
+          timestamp: 'distinct count',
+        })
       );
     }
   }
 
   componentDidUpdate() {
-    // Everytime the data props is updated, insert the data into Perspective table
+    // Insert data into Perspective table every time the data props updates
+
     if (this.table) {
-      // As part of the task, you need to fix the way we update the data props to
-      // avoid inserting duplicated entries into Perspective table again.
       this.table.update(
         this.props.data.map((el: any) => {
-          // Format the data from ServerRespond to the schema
+          // Format data from ServerRespond to schema
+
           return {
             stock: el.stock,
             top_ask_price: (el.top_ask && el.top_ask.price) || 0,
