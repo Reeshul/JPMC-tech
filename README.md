@@ -1,4 +1,4 @@
-To stream simulated data, run datafeed serevr:
+To stream simulated data, run datafeed server:
 
 ### `python datafeed/server.py`
 
