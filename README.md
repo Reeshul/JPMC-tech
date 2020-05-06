@@ -1,4 +1,4 @@
-To stream simulated data, run datafeed server:
+Run datafeed server
 
 ### `python datafeed/server.py`
 
